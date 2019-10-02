@@ -1,0 +1,7 @@
+Checkpoint/
+ImageNet_Note/
+*.zip
+\[Additional Training\]*.ipynb
+.ipynb_checkpoints/
+__pycache__/
+Data/

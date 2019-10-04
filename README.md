@@ -83,6 +83,8 @@ Gradient descent is very important to train deep neural network. But, convention
 
 ## 2. Network Blocks
 
+![block](./images/block.png)
+
 Our network blocks are divided into two, stem block and mobile block.
 When downsampling the layer-wise input, we use the depthwise kernel size as 2 and attach the 1x1 convolution block at the shortcut.
 

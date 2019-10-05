@@ -2,15 +2,15 @@
 
 The main contributions are divided into three parts.
 
-1. **Orthonormal regularization**
+## 1. **Orthonormal regularization**
 
 From previous works, dynamic isometric property increases the network performance, but actually the gain from previous orthonormal regularizer is minuscule. We found that attaching the orthonormal regularizer only on 1x1 convolution increase remarkable amounts in the performance, and we argue that this is very related to feature map space.
 
-2. **Initialization**
+## 2. **Initialization**
 
 Many networks are initialized with Kaiming initialization or Xavier initialization, but the weights of converged networks are very far from the intial weight distribution. From the empirical results, we found that with our method, trained weight distribution are always certain. Therefore, we initialized  our networks with this obtained weight distribution.
 
-3. **Weighted label smooth loss function**
+## 3. **Weighted label smooth loss function**
 
 The most well-known loss function in convolutional neural networks is Cross-Entropy loss. In the recent, label smooth function can both enhance the robustness, and increase the performance so that many replace the loss function as label smooth.  However, this method doesn’t deal with the class-correlation, so sometimes the network is not well-trained when increasing the epsilon. In our loss function called weighted label smooth loss function, this distribute the epsilon with considering class-correlation. The key idea of scaling the class-relativity is to score the weight as the cosine similarity with the class representative feature vector from fully connected layer’s ith row vector.
 
@@ -31,17 +31,15 @@ We attach the Squeeze-and-Excitation (SE) block at the end of the each block in 
 
 #### ii) [Inverted Residual Block](https://arxiv.org/abs/1801.04381) [Sandler et al., 2018]
 
-Inverted residual block was first introduced in MobileNetV2 model. This block becomes basic structure of following networks such as [MnasNet](http://arxiv.org/abs/1807.11626), [EfficientNet](http://arxiv.org/abs/1905.11946), [MobileNetV3](https://arxiv.org/abs/1905.02244). 
-
-Our network is based on MobileNetV3 architecture, so our model, of course, follows inverted residual block structure.
+Inverted residual block was first introduced in MobileNetV2 model. This block becomes basic structure of following networks such as [MnasNet](http://arxiv.org/abs/1807.11626), [EfficientNet](http://arxiv.org/abs/1905.11946), [MobileNetV3](https://arxiv.org/abs/1905.02244). Our network is based on MobileNetV3 architecture, so our model, of course, follows inverted residual block structure.
 
 #### iii) [HSwish activation](https://arxiv.org/abs/1905.02244) [Howard et al., 2019]
 
-Hard swish(in short, HSwish) activation was introduced in Searching for MobileNetV3 paper from Google. They replaced original swish function with HSwish function. Their Hswish function is defined as follow.
+Hard swish (HSwish) activation was introduced in Searching for [MobileNetV3](https://arxiv.org/abs/1905.02244) from Google. Hswish function is defined as follow.
 
 $$h-swish(x) = x \frac{ReLU6(x+3)}{6}$$
 
-They claimed that it shows similar accuracy with original swish function but has better computation time. We incorporated this activation function in our model for better accuracy.
+We incorporated this activation function in our model for better accuracy.
 
 #### iv) [Batch Normalization](https://arxiv.org/abs/1502.03167) [Ioffe et al., 2015]
 
@@ -70,7 +68,7 @@ To prevent the overfitting of deep learning model, we need to use regularization
 
 #### iii) [Momentum](https://www.cs.toronto.edu/~fritz/absps/momentum.pdf) [Sutskever et al., 2013]
 
-Gradient descent is very important to train deep neural network. But, conventional GD is easily stuck in local optimum. So, There are many gradient descent optimization algorithm to address it. Recently, SGD is commonly used and enough to train deep learning model with momentum. The momentum helps to converge better by preventing stuck to local optima when gradient descent. Therefore, we use momentum with cosine annealing function as a optimizer.
+Gradient descent is very important to train deep neural network. But, conventional GD is easily stuck in local optimum. So, There are many gradient descent optimization algorithm to address it. Recently, SGD is commonly used and enough to train deep learning model with momentum. The momentum helps to converge better by preventing stuck to local optima when gradient descent. Therefore, we add momentum with SGD optimizer.
 
 ## 5. Pruning
 
@@ -81,7 +79,10 @@ Gradient descent is very important to train deep neural network. But, convention
 # Reproduce
 
 ## 1. Network Overview
-
+```
+Stem : (in channels, out channels, kernel size, stride)
+MicroBlock : (in channels, out channels, expansion rate, kernel size, stride, se ratio)
+```
 ## 2. Network Blocks
 
 ![block](./images/block.png)

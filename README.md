@@ -87,7 +87,7 @@ MicroBlock : (in channels, out channels, expansion rate, kernel size, stride, se
 
 ## 2. Network Blocks
 
-![stem](./images/Stem.png)
+![stem](./images/Stem.png = 100x20)
 ![block1](./images/Block1.png)
 ![block1](./images/Block2.png)
 

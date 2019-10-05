@@ -26,13 +26,14 @@ We use several blocks, layers, and activation that are known to be efficient in 
 
 #### i) [SE Block](https://arxiv.org/abs/1709.01507) [Hu et al., 2017]
 
-At output of each block in our model, we add SE block. Original SE block consists of two fully-connected layer. These two fully-connected layer produces per-channel information followed by sigmoid function. Then, these values are multiplied to original input features to SE block. In our network, we make SE block using two 1 x 1 convolution layer which is essentially same as fully-connected layer.
+We attach the Squeeze-and-Excitation (SE) block at the end of the each block in network. Normalizing the input only with batch normalization is a bit hard, but with SE block, it plays a role as scaling factor of covariate shift.
+
 
 #### ii) [Inverted Residual Block](https://arxiv.org/abs/1801.04381) [Sandler et al., 2018]
 
-Inverted residual block was first introduced in MobileNetV2 model. Original residual block was bottleneck block, which reduces number of channels in input feature map and recover this channel at the output of block. MobileNetV2 change this structure by expanding the number of channel in bottleneck layer, hence called inverted residual block. This block becomes basic structure of following networks such as [MnasNet](http://arxiv.org/abs/1807.11626), [EfficientNet](http://arxiv.org/abs/1905.11946), [MobileNetV3](https://arxiv.org/abs/1905.02244).
+Inverted residual block was first introduced in MobileNetV2 model. This block becomes basic structure of following networks such as [MnasNet](http://arxiv.org/abs/1807.11626), [EfficientNet](http://arxiv.org/abs/1905.11946), [MobileNetV3](https://arxiv.org/abs/1905.02244). 
 
-Our network is based on EfficientNet architecture, so our model, of course, follows inverted residual block structure.
+Our network is based on MobileNetV3 architecture, so our model, of course, follows inverted residual block structure.
 
 #### iii) [HSwish activation](https://arxiv.org/abs/1905.02244) [Howard et al., 2019]
 

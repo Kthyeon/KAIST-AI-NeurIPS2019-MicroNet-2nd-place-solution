@@ -25,7 +25,7 @@ The most well-known loss function in convolutional neural networks is Cross-Entr
 
 ## 1. Data Augmentation
 
-#### i) [Fast AutoAugmentation](https://arxiv.org/abs/1905.00397) [Lim et al., 2019]
+#### I) [Fast AutoAugmentation](https://arxiv.org/abs/1905.00397) [Lim et al., 2019]
 
 We use fast autoaugmentation of CIFAR100, which is made from the networks, wide-resnet and densenet. 
 
@@ -33,16 +33,16 @@ We use fast autoaugmentation of CIFAR100, which is made from the networks, wide-
 
 We use several blocks, layers, and activation that are known to be efficient in our MicroNet network. These are listed as follow.
 
-#### i) [SE Block](https://arxiv.org/abs/1709.01507) [Hu et al., 2017]
+#### I) [SE Block](https://arxiv.org/abs/1709.01507) [Hu et al., 2017]
 
 We attach the Squeeze-and-Excitation (SE) block at the end of the each block in network. Normalizing the input only with batch normalization is a bit hard, but with SE block, it plays a role as scaling factor of covariate shift.
 
 
-#### ii) [Inverted Residual Block](https://arxiv.org/abs/1801.04381) [Sandler et al., 2018]
+#### II) [Inverted Residual Block](https://arxiv.org/abs/1801.04381) [Sandler et al., 2018]
 
 Inverted residual block was first introduced in MobileNetV2 model. This block becomes basic structure of following networks such as [MnasNet](http://arxiv.org/abs/1807.11626), [EfficientNet](http://arxiv.org/abs/1905.11946), [MobileNetV3](https://arxiv.org/abs/1905.02244). Our network is based on MobileNetV3 architecture, so our model, of course, follows inverted residual block structure.
 
-#### iii) [HSwish activation](https://arxiv.org/abs/1905.02244) [Howard et al., 2019]
+#### III) [HSwish activation](https://arxiv.org/abs/1905.02244) [Howard et al., 2019]
 
 Hard swish (HSwish) activation was introduced in Searching for [MobileNetV3](https://arxiv.org/abs/1905.02244) from Google. Hswish function is defined as follow.
 
@@ -51,38 +51,38 @@ Hard swish (HSwish) activation was introduced in Searching for [MobileNetV3](htt
 
 We incorporated this activation function in our model for better accuracy.
 
-#### iv) [Batch Normalization](https://arxiv.org/abs/1502.03167) [Ioffe et al., 2015]
+#### IV) [Batch Normalization](https://arxiv.org/abs/1502.03167) [Ioffe et al., 2015]
 
 To solve the internal covariate shift, we add the batch normalization between each convolution and activation function, and empirically, we found using batch normalization generalizes better.
 
 ## 3. Network Training
 
-#### i) [Orthonormal Regularization](https://arxiv.org/abs/1810.09102) [Bansal et al., 2018]
+#### I) [Orthonormal Regularization](https://arxiv.org/abs/1810.09102) [Bansal et al., 2018]
 
 We use the orthonormal regularization (Spectral Restricted Isometry Property Regularization from above work) on pointwise convolution layer, not on depthwise convolution layer. To orthogonalize the weight matrix, one of the efficient way is to regularize the singular value of the matrix. However, this cause a lot of computation costs so that we use an approximated method called SRIP similar with RIP method. In ours, we add this regularizer with $10^{-2}$ coefficient.
 
-#### ii) [Cosine Annealing Scheduler](https://arxiv.org/abs/1608.03983) [Loshchilov et al., 2016]
+#### II) [Cosine Annealing Scheduler](https://arxiv.org/abs/1608.03983) [Loshchilov et al., 2016]
 
 We use the cosine annealing function as the learning rate scheduler. Converging to local optima is well-known issue in training deep neural network. We found that the periodic function can solve this issue with high probability, and from the empirical results, the output network generalizes better than others.
 (i.e. also, if you want other periodic function, you can use it and we check the step decay function can replace this consine annealing scheduler.)
 
 ## 4. Network Regularization
 
-#### i) [Cutmix](https://arxiv.org/abs/1905.04899) [Yun et al., 2019]
+#### I) [Cutmix](https://arxiv.org/abs/1905.04899) [Yun et al., 2019]
 
 To improve the deep learning model performance, it is indeed necessary to use data augmentation. Among many recent various data augmentation method, CutMix consistently outperforms the state-of-the-art augmentation strategies on CIFAR and ImageNet classification tasks. Therefore, we apply CutMix augmentation strategy to our dataset(CIFAR-100) for better performance on MicroNet Challenge 2019.
 
-#### ii) [Weight decay](https://papers.nips.cc/paper/563-a-simple-weight-decay-can-impro) [Krogh et al., 1991]
+#### II) [Weight decay](https://papers.nips.cc/paper/563-a-simple-weight-decay-can-impro) [Krogh et al., 1991]
 
 To prevent the overfitting of deep learning model, we need to use regularization method. One of kind regularization method is the weight decay which is to penalize weights proportionally to their magnitude to prevent overfitting during trainnig. But, when model is quite small like compressed model, big weight decay aggravate the training performance. As our purpose is to get small model with better performance, we use a little bit smaller weight decay.
 
-#### iii) [Momentum](https://www.cs.toronto.edu/~fritz/absps/momentum.pdf) [Sutskever et al., 2013]
+#### III) [Momentum](https://www.cs.toronto.edu/~fritz/absps/momentum.pdf) [Sutskever et al., 2013]
 
 Gradient descent is very important to train deep neural network. But, conventional GD is easily stuck in local optimum. So, There are many gradient descent optimization algorithm to address it. Recently, SGD is commonly used and enough to train deep learning model with momentum. The momentum helps to converge better by preventing stuck to local optima when gradient descent. Therefore, we add momentum with SGD optimizer.
 
 ## 5. Pruning
 
-#### i) [Lottery Ticket Hypothesis](https://arxiv.org/abs/1803.03635) [Frankle et al., 2018]
+#### I) [Lottery Ticket Hypothesis](https://arxiv.org/abs/1803.03635) [Frankle et al., 2018]
 
 [Han et al., 2015] suggested deep learning pruning method based on magnitude very well. But, this conventional pruning method has very critical weakness which is the too many re-training process. To address it, [Frankle et al., 2019] defines the lottery ticket hypothesis which is that A randomly-initialized, dense-neural networks contain subnetworks called winning tickets. Here, winning ticket can reach the comparable test acuuracy in at most same iteration of original netwrok through re-initialization right before re-training process. As lottery ticket is a very recent powerful pruning method, To get pruned network, we apply it to our model to compress most for MicroNet Challenge 2019.
 
@@ -125,6 +125,6 @@ loss function: weighted labelsmooth function (ours)
 
 If you want to reproduce our network, execute `python3 micronet_main.py`
 
-## 5. Flops
+## 5. FLOPs
 
 We refer to ‘thop’ library source from [here](https://github.com/Lyken17/pytorch-OpCounter) to count the add operations and multiplication operations. However, to keep the rules of (Neurips 19’s)  micronet challenge, we change many parts of the counting functions. In code, addition is counted 3 and multiplication is counted 1 for the relu6 operations. This is because ReLU6 is only used in hard swish function so that this counting policy is actually for hard swish function when counting the operations of our network.

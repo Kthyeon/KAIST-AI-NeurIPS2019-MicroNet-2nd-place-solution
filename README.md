@@ -46,9 +46,8 @@ Inverted residual block was first introduced in MobileNetV2 model. This block be
 
 Hard swish (HSwish) activation was introduced in Searching for [MobileNetV3](https://arxiv.org/abs/1905.02244) from Google. Hswish function is defined as follow.
 
-\begin{equation}
-  Hswish(x) = x \frac{ReLU6(x+3)}{6}
-\end{equation}
+![equation](http://www.sciweavers.org/tex2img.php?eq=HSwish%28x%29%20%3D%20x%20%2A%20%5Cfrac%7BReLU_%7B6%7D%28x%2B3%29%7D%7B6%7D&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0)
+
 
 We incorporated this activation function in our model for better accuracy.
 

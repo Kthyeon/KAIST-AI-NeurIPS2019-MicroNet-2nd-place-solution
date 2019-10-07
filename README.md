@@ -8,7 +8,7 @@ From previous works, dynamic isometric property increases the network performanc
 
 ![orthonormality](./images/Orthonormality.png)
 
-It is termed as the Spectral Restricted Isometry Property (SRIP) regularization. [Bansal et al., 2018](https://arxiv.org/abs/1810.09102)
+It is termed as the Spectral Restricted Isometry Property (SRIP) regularization. ([Bansal et al., 2018](https://arxiv.org/abs/1810.09102))
 
 ## 2. **Initialization**
 

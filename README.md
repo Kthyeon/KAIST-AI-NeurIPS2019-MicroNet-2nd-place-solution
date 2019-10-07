@@ -127,12 +127,16 @@ To get our pruned micronet, you go through 2 steps: I. Smooth Signal propagation
 #### I. Smooth Signal propagation
 To reproduce our network, run:
 
-`python3 micronet_main.py --model=micronet --dataset=CIFAR100 --lr=0.1 --batch_size=128 --lr_type=cos --n_epoch=800 --input_regularize=cutmix --label_regularization=labelsimilar --name=micronet_ver_test --ortho_lr=0.01`
+```
+python3 micronet_main.py --model=micronet --dataset=CIFAR100 --lr=0.1 --batch_size=128 --lr_type=cos --n_epoch=800 --input_regularize=cutmix --label_regularization=labelsimilar --name=micronet_ver_test --ortho_lr=0.01
+```
 
 #### II. Smooth Signal propagation
 First of all, you should load the parameters from the step I network (name: micronet_ver_test), and then execute the code with your desired prune rate. We get the network with 50% prune rate.
 
-`python3 micronet_main.py --model=micronet_prune --dataset=CIFAR100 --lr=0.1 --batch_size=128 --lr_type=cos --n_epoch=800 --input_regularize=cutmix --label_regularization=labelsimilar --name=micronet_ver_test --ortho_lr=0.01 --prune_rate=50.`
+```
+python3 micronet_main.py --model=micronet_prune --dataset=CIFAR100 --lr=0.1 --batch_size=128 --lr_type=cos --n_epoch=800 --input_regularize=cutmix --label_regularization=labelsimilar --name=micronet_ver_test --ortho_lr=0.01 --prune_rate=50.
+```
 
 ## 5. FLOPs
 

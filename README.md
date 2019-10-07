@@ -131,7 +131,7 @@ To reproduce our network, run:
 python3 micronet_main.py --model=micronet --dataset=CIFAR100 --lr=0.1 --batch_size=128 --lr_type=cos --n_epoch=800 --input_regularize=cutmix --label_regularization=labelsimilar --name=micronet_ver_test --ortho_lr=0.01
 ```
 
-#### II. Smooth Signal propagation
+#### II. Iterative lottery ticket prune
 First of all, you should load the parameters from the step I network (name: micronet_ver_test), and then execute the code with your desired prune rate. We get the network with 50% prune rate.
 
 ```

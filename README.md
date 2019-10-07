@@ -96,9 +96,9 @@ MicroBlock : (in channels, out channels, expansion rate, kernel size, stride, se
 ![network](./images/Network.png)
 
 ## 2. Network Blocks
-<img src="./images/Stem.png" width="300">
-<img src="./images/Block1.png" width="600">
-<img src="./images/Block2.png" width="600">
+<img src="./images/Stem.png" width="400">
+<img src="./images/Block1.png" width="750">
+<img src="./images/Block2.png" width="750">
 
 Our network blocks are divided into two, stem block and mobile block.
 When downsampling the layer-wise input, we use the depthwise kernel size as 2 and attach the 1x1 convolution block at the shortcut.

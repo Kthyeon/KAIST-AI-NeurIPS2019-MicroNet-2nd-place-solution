@@ -27,6 +27,8 @@ The most well-known loss function in convolutional neural networks is Cross-Entr
 
 #### i) [Fast AutoAugmentation](https://arxiv.org/abs/1905.00397) [Lim et al., 2019]
 
+We use fast autoaugmentation of CIFAR100, which is made from the networks, wide-resnet and densenet. 
+
 ## 2. Network Structure
 
 We use several blocks, layers, and activation that are known to be efficient in our MicroNet network. These are listed as follow.

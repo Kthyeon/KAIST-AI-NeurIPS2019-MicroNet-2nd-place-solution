@@ -6,7 +6,9 @@ The main contributions are divided into three parts.
 
 From previous works, dynamic isometric property increases the network performance, but actually the gain from previous orthonormal regularizer is minuscule. We found that attaching the orthonormal regularizer only on 1x1 convolution increase remarkable amounts in the performance, and we argue that this is very related to feature map space.
 
-![orthonormality](./images/Orthonoramlity.png)
+![orthonormality](./images/Orthonormality.png)
+
+It is termed as the Spectral Restricted Isometry Property (SRIP) regularization. [Bansal et al., 2018](https://arxiv.org/abs/1810.09102)
 
 ## 2. **Initialization**
 

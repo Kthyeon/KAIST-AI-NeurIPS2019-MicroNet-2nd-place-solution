@@ -1,6 +1,6 @@
 # Our Contribution
 
-The main contributions are divided into three parts.
+The main contributions are divided into four parts.
 
 ## 1. **Orthonormal regularization**
 
@@ -20,6 +20,9 @@ The most well-known loss function in convolutional neural networks is Cross-Entr
 
 ![smooth](./images/Adaptive_Label_Smooth.png)
 
+## 4. **Prune with iterative training**
+
+Recently, iterative pruning with lottery ticket hypothesis is one of the state-of-art pruning method. However, here, we found that keeping pretrained weight, not using random-init, is a bit beneficial for network, and increasing the pruning rate with linear scheduling can preserve the performance. For instance, if you want to prune 50% of the pretrained network weights, then train the pruned network 4 times with pruned rate as 12.5%, 25.0%, 37.5%, and 50%. Then, you could train the 50% pruned network without accuracy loss.
 
 # Method
 

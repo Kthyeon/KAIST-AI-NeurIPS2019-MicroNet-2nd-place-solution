@@ -93,7 +93,11 @@ Gradient descent is very important to train deep neural network. But, convention
 Stem : (in channels, out channels, kernel size, stride)
 MicroBlock : (in channels, out channels, expansion rate, kernel size, stride, se ratio)
 ```
+We made two types of micronet. They are slightly different and the overview of network is like below.
+#### Network version 1
 ![network](./images/Network.png)
+#### Network version 2
+![network](./images/Network2.png)
 
 ## 2. Network Blocks
 <img src="./images/Stem.png" width="400">

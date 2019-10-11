@@ -160,3 +160,20 @@ Details about score method, we deal with it in the jupyter notebooke file `Score
 
 
 Thank you for reading.
+
+## Dependencies
+
+Current code base is tested under following environment:
+
+1. Python
+2. PyTorch
+3. torchvision
+4. Numpy
+5. SciPy
+6. tqdm
+
+## Contact
+
+To contact us:
+
+Tae hyeon Kim, potter32@kaist.ac.kr

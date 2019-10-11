@@ -66,7 +66,7 @@ We use the orthonormal regularization (Spectral Restricted Isometry Property Reg
 
 #### II. [Cosine Annealing Scheduler](https://arxiv.org/abs/1608.03983) [Loshchilov et al., 2016]
 
-We use the cosine annealing function as the learning rate scheduler. Converging to local optima is well-known issue in training deep neural network. We found that the periodic function can solve this issue with high probability, and from the empirical results, the output network generalizes better than others.
+We use the cosine annealing function as the learning rate scheduler. Converging to local optima is the well-known issue in training deep neural network. We found that the periodic function can solve this issue with high probability, and from the empirical results, the output network generalizes better than others.
 (i.e. also, if you want other periodic function, you can use it and we check the step decay function can replace this consine annealing scheduler.)
 
 ## 4. Network Regularization

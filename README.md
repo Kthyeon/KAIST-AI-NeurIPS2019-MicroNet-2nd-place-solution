@@ -87,7 +87,7 @@ Gradient descent is very important to train deep neural network. But, convention
 
 #### I. [Lottery Ticket Hypothesis](https://arxiv.org/abs/1803.03635) [Frankle et al., 2018]
 
-[Han et al., 2015] suggested deep learning pruning method based on magnitude very well. But, this conventional pruning method has very critical weakness which is the too many re-training process. To address it, [Frankle et al., 2019] defines the lottery ticket hypothesis which is that A randomly-initialized, dense-neural networks contain subnetworks called winning tickets. Here, winning ticket can reach the comparable test acuuracy in at most same iteration of original netwrok through re-initialization right before re-training process. As lottery ticket is a very recent powerful pruning method, To get pruned network, we apply it to our model to compress most for MicroNet Challenge 2019.
+[Han et al., 2015] suggested deep learning pruning method based on magnitude very well. But, this conventional pruning method has very critical weakness which is the too many re-training process. To address it, [Frankle et al., 2019] defines the lottery ticket hypothesis which is that A randomly-initialized, dense-neural networks contain subnetworks called winning tickets. Here, winning ticket can reach the comparable test acuuracy in at most same iteration of original netwrok through re-initialization right before re-training process. As lottery ticket is a very recent powerful pruning method, to get pruned network, we prune the network almost same with this method except for random initialization.
 
 # Reproduce
 

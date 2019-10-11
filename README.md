@@ -30,7 +30,7 @@ Recently, iterative pruning with lottery ticket hypothesis is one of the state-o
 
 #### I. [Fast AutoAugmentation](https://arxiv.org/abs/1905.00397) [Lim et al., 2019]
 
-We use fast autoaugmentation of CIFAR100, which is made from the networks, wide-resnet and densenet. 
+We use fast autoaugmentation of CIFAR100, which is made from the networks, wide-resnet and densenet. We can get the CIFAR100 Fast Autoaugmentation strategies from the authors of above paper.
 
 ## 2. Network Structure
 
@@ -62,32 +62,33 @@ To solve the internal covariate shift, we add the batch normalization between ea
 
 #### I. [Orthonormal Regularization](https://arxiv.org/abs/1810.09102) [Bansal et al., 2018]
 
-We use the orthonormal regularization (Spectral Restricted Isometry Property Regularization from above work) on pointwise convolution layer, not on depthwise convolution layer. To orthogonalize the weight matrix, one of the efficient way is to regularize the singular value of the matrix. However, this causes a lot of computation costs so that we use an approximated method called SRIP similar with RIP method. In ours, we add this regularizer with $10^{-2}$ coefficient.
+We use the orthonormal regularization (Spectral Restricted Isometry Property Regularization from above work) on pointwise convolution layer, not on depthwise convolution layer. To orthogonalize the weight matrix, one of the efficient way is to regularize the singular value of the matrix. However, this cause a lot of computation costs so that we use an approximated method called SRIP similar with RIP method. In ours, we add this regularizer with $10^{-2}$ coefficient.
 
 #### II. [Cosine Annealing Scheduler](https://arxiv.org/abs/1608.03983) [Loshchilov et al., 2016]
 
-We use the cosine annealing function as the learning rate scheduler. Converging to local optima is the well-known issue in training deep neural network. We found that the periodic function can solve this issue with high probability, and from the empirical results, the output network generalizes better than others.
+We use the cosine annealing function as the learning rate scheduler. Converging to local optima is well-known issue in training deep neural network. We found that the periodic function can solve this issue with high probability, and from the empirical results, the output network generalizes better than others.
 (i.e. also, if you want other periodic function, you can use it and we check the step decay function can replace this consine annealing scheduler.)
 
 ## 4. Network Regularization
 
 #### I. [Cutmix](https://arxiv.org/abs/1905.04899) [Yun et al., 2019]
 
-To improve the deep learning model performance, it is indeed necessary to use data augmentation. Among many recent various data augmentation method, CutMix consistently outperforms the state-of-the-art augmentation strategies on CIFAR and ImageNet classification tasks. Therefore, we apply CutMix augmentation strategy to our dataset(CIFAR-100) for better performance on MicroNet Challenge 2019.
+For better generalization in data augementation policy, we apply `CutMix` regularization which outperfroms other state-of-the-art methods. This method enables that the network have the effects from both a regional dropout stategy and a mixup stategy. 
+
 
 #### II. [Weight decay](https://papers.nips.cc/paper/563-a-simple-weight-decay-can-impro) [Krogh et al., 1991]
 
-To prevent the overfitting of deep learning model, we need to use regularization method. One of kind regularization method is the weight decay which is to penalize weights proportionally to their magnitude to prevent overfitting during trainnig. But, when model is quite small like compressed model, big weight decay aggravate the training performance. As our purpose is to get small model with better performance, we use a little bit smaller weight decay.
+To prevent the overfitting of deep learning model, we need to use regularization method. One of kind regularization method is the weight decay which is to penalize weights proportionally to their magnitude to prevent overfitting during trainnig. However, when model is quite small like compressed model, weight decay aggravate the training performance. Therfore, we use a little bit small weight decay and for version1 network, we did not apply weight decay on the parameters of batch normalization.
 
 #### III. [Momentum](https://www.cs.toronto.edu/~fritz/absps/momentum.pdf) [Sutskever et al., 2013]
 
-Gradient descent is very important to train deep neural network. But, conventional GD is easily stuck in local optimum. So, There are many gradient descent optimization algorithm to address it. Recently, SGD is commonly used and enough to train deep learning model with momentum. The momentum helps to converge better by preventing stuck to local optima when gradient descent. Therefore, we add momentum with SGD optimizer.
+Gradient descent is very important to train deep neural network. However, conventional GD is easily stuck in local optimum. Therefore, there are many gradient descent optimization algorithms to address it. Recently, SGD is commonly used and enough to train deep learning model with momentum. The momentum helps to converge better by preventing stuck to local optima when gradient descent. Therefore, we use SGD optimizer with momentum.
 
 ## 5. Pruning
 
 #### I. [Lottery Ticket Hypothesis](https://arxiv.org/abs/1803.03635) [Frankle et al., 2018]
 
-[Han et al., 2015] suggested deep learning pruning method based on magnitude very well. But, this conventional pruning method has very critical weakness which is the too many re-training process. To address it, [Frankle et al., 2019] defines the lottery ticket hypothesis which is that A randomly-initialized, dense-neural networks contain subnetworks called winning tickets. Here, winning ticket can reach the comparable test acuuracy in at most same iteration of original network through re-initialization right before re-training process. As lottery ticket is a very recent powerful pruning method, to get pruned network, we prune the network almost same with this method.
+[Han et al., 2015] suggested deep learning pruning method based on magnitude very well. But, this conventional pruning method has very critical weakness which is the too many re-training process. To address it, [Frankle et al., 2019] defines the lottery ticket hypothesis which is that A randomly-initialized, dense-neural networks contain subnetworks called winning tickets. Here, winning ticket can reach the comparable test acuuracy in at most same iteration of original netwrok through re-initialization right before re-training process. As lottery ticket is a very recent powerful pruning method, we prune the network almost same with this method except for random initialization.
 
 # Reproduce
 
@@ -133,6 +134,13 @@ loss function: weighted labelsmooth function (ours)
 To get our pruned micronet, you go through 2 steps: I. Smooth Signal propagation, II. Iterative lottery ticket prune.
 
 #### I. Smooth Signal propagation
+To reproduce our network as version 1, run:
+
+```
+python3 micronet_main.py --model=micronet --dataset=CIFAR100 --lr=0.1 --batch_size=128 --lr_type=cos --n_epoch=600 --input_regularize=cutmix --label_regularization=crossentropy --name=micronet_reproduce --ortho_lr=0.7 --model_ver=ver1 --progress_name=reproduce_progress --batch_wd=False
+```
+
+
 To reproduce our network as version 2, run:
 
 ```
@@ -142,9 +150,22 @@ python3 micronet_main.py --model=micronet --dataset=CIFAR100 --lr=0.1 --batch_si
 #### II. Iterative lottery ticket prune
 First of all, you should load the parameters from the step I network (name: micronet_ver_test), and then execute the code with your desired prune rate. We get the network with 45% prune rate.
 
+#### ver1
+```
+python3 micronet_main.py --model=micronet_prune --dataset=CIFAR100 --lr=0.1 --batch_size=128 --lr_type=cos --n_epoch=600 --input_regularize=cutmix --label_regularization=crossentropy --name=micronet_reproduce_pr1 --ortho_lr=0.7 --max_prune_rate=45. --load_name=micronet_reproduce --model_ver=ver1 --batch_wd=False
+```
+
+And after training above, run prune-training once again:
+```
+python3 micronet_main.py --model=micronet_prune --dataset=CIFAR100 --lr=0.1 --batch_size=128 --lr_type=cos --n_epoch=600 --input_regularize=cutmix --label_regularization=crossentropy --name=micronet_reproduce_pr2 --ortho_lr=0.7 --min_prune_rate=45. --max_prune_rate=65. --load_name=micronet_reproduce_pr1 --model_ver=ver1 --batch_wd=False
+```
+
+
+#### ver2
 ```
 python3 micronet_main.py --model=micronet_prune --dataset=CIFAR100 --lr=0.1 --batch_size=128 --lr_type=cos --n_epoch=600 --input_regularize=cutmix --label_regularization=crossentropy --name=micronet_reproduce_pr1 --ortho_lr=0.7 --max_prune_rate=45. --load_name=micronet_reproduce --model_ver=ver2
 ```
+
 And after training above, run prune-training once again:
 ```
 python3 micronet_main.py --model=micronet_prune --dataset=CIFAR100 --lr=0.1 --batch_size=128 --lr_type=cos --n_epoch=600 --input_regularize=cutmix --label_regularization=crossentropy --name=micronet_reproduce_pr2 --ortho_lr=0.7 --min_prune_rate=45. --max_prune_rate=65. --load_name=micronet_reproduce_pr1 --model_ver=ver2
@@ -156,7 +177,7 @@ After this, you may get the final checkpoints which have the accuracy higher tha
 
 We refer to ‘thop’ library source from [here](https://github.com/Lyken17/pytorch-OpCounter) to count the add operations and multiplication operations. However, to keep the rules of (Neurips 19’s)  micronet challenge, we change many parts of the counting functions. In code, addition is counted 3 and multiplication is counted 1 for the relu6 operations. This is because ReLU6 is only used in hard swish function so that this counting policy is actually for hard swish function when counting the operations of our network.
 
-Details about score method, we deal with it in jupyter notebook file `Score_MicroNet.ipynb`.
+Details about score method, we deal with it in the jupyter notebooke file `Score_MicroNet.ipynb`.
 
 
 Thank you for reading.

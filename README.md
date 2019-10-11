@@ -165,12 +165,11 @@ Thank you for reading.
 
 Current code base is tested under following environment:
 
-1. Python
-2. PyTorch
-3. torchvision
-4. Numpy
-5. SciPy
-6. tqdm
+1. Python 3.7.3
+2. PyTorch 1.1.0
+3. torchvision 0.3.0
+4. Numpy 1.16.2
+5. tqdm
 
 ## Contact
 

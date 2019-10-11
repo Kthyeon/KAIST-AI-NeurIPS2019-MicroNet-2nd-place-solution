@@ -99,7 +99,7 @@ class MicroBlock_prune(nn.Module):
 
 class MicroNet_Prune(nn.Module):
     # (expansion, out_planes, num_blocks, stride)
-    def __init__(self, num_classes=100, groups=1, wide_factor = 1, depth_factor =1, add_se = True, Activation = 'HSwish'):
+    def __init__(self,  device, ver = 'ver2', num_classes=100, groups=1, wide_factor = 1, depth_factor =1, add_se = True, Activation = 'HSwish'):
         super(MicroNet_Prune, self).__init__()
         # NOTE: change conv1 stride 2 -> 1 for CIFAR10
         '''
@@ -107,20 +107,31 @@ class MicroNet_Prune(nn.Module):
         wide_factor: channel을 늘리는 비율
         depth_factor: depth를 늘리는 비율
         '''
-        self.cfg =[[2.5, 16, 2, 1],
-                    [2.5, 32, 1, 2],
-                    [2.5, 32, 1, 1],
-                    [2.5, 48, 3, 1],
-                    [2.5, 72, 1, 2],
-                    [2.5, 72, 4, 1],
-                    [2.5, 80, 1, 2],
-                    [2.5, 88, 2, 1],
-                    [2.5, 106, 1, 1]]
-        
+        if ver == 'ver2':
+            self.cfg = [[2.5, 20, 2, 1],
+                        [2.5, 36, 1, 2],
+                        [2.5, 36, 1, 1],
+                        [2.5, 56, 3, 1],
+                        [2.5, 80, 1, 2],
+                        [2.5, 80, 4, 1],
+                        [2.5, 88, 1, 2],
+                        [2.5, 96, 2, 1],
+                        [2.5, 114, 1, 1]]
+        else:
+            self.cfg = [[3, 16, 2, 1],
+                        [3, 32, 1, 2],
+                        [3, 32, 1, 1],
+                        [3, 48, 3, 1],
+                        [3, 72, 1, 2],
+                        [3, 72, 4, 1],
+                        [3, 80, 1, 2],
+                        [3, 88, 2, 1],
+                        [3, 106, 1, 1]]
+
         #reconstruct structure config
         self.change_cfg(wide_factor, depth_factor)
         #make train recipe
-        self.set_config(batch_size = 128, momentum = 0.9, lr = 0.1, num_epochs =200, criterion = nn.CrossEntropyLoss(), weight_decay = 1e-5, gamma = 0.1, milestones = [100, 150], device = 'cuda:0' if cuda.is_available() else 'cpu', nesterov = True)
+        self.set_config(batch_size = 128, momentum = 0.9, lr = 0.1, num_epochs =200, criterion = nn.CrossEntropyLoss(), weight_decay = 1e-5, gamma = 0.1, milestones = [100, 150], device = device, nesterov = True)
         
 
         self.add_se = add_se

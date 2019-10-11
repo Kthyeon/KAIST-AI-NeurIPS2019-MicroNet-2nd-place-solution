@@ -30,8 +30,9 @@ def fc_similarity(model, device):
     for i in range(num):
         for j in range(num):
             similarity[i,j] = torch.abs(cos_si(weight_matrix[i], weight_matrix[j]))
+        #similarity[i,i] = 0.
+        similarity[i] = torch.exp(similarity[i]) / (torch.sum(torch.exp(similarity[i])) - torch.exp(similarity[i,i]))
         similarity[i,i] = 0.
-        similarity[i] = similarity[i]/torch.sum(similarity[i])
     
     return similarity
     

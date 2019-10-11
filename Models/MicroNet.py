@@ -43,13 +43,11 @@ class MicroBlock(nn.Module):
         planes = int(expansion * in_planes)
         self.conv1 = nn.Conv2d(in_planes, planes, kernel_size=1, stride=1, padding=0, bias=False)
         
-        #self.bn1 = nn.BatchNorm2d(planes, momentum=0.01)
-        self.bn1 = nn.BatchNorm2d(planes, momentum=0.01, affine=False)
+        self.bn1 = nn.BatchNorm2d(planes, momentum=0.01)
         
         self.conv2 = nn.Conv2d(planes, planes, kernel_size=3, stride=stride, padding=1, groups=planes, bias=False)
         
         self.bn2 = nn.BatchNorm2d(planes, momentum=0.01)
-        #self.bn2 = nn.BatchNorm2d(planes, momentum=0.01, affine=False)
         
         self.conv3 = nn.Conv2d(planes, out_planes, kernel_size=1, stride=1, padding=0, bias=False)
         self.bn3 = nn.BatchNorm2d(out_planes, momentum=0.01)
@@ -86,7 +84,7 @@ class MicroBlock(nn.Module):
 
     def forward(self, x):
         out = self.act1(self.bn1(self.conv1(x)))
-        out = (out - 1/6) / np.sqrt(11/36)
+        #out = (out - 1/6) / np.sqrt(11/36)
         out = self.act2(self.bn2(self.conv2(out)))
         #out = (out - 1/6) / np.sqrt(11/36)
         out = self.bn3(self.conv3(out))
@@ -106,22 +104,33 @@ class MicroBlock(nn.Module):
 
 class MicroNet(nn.Module):
     # (expansion, out_planes, num_blocks, stride)
-    def __init__(self, num_classes=100, wide_factor = 1, depth_factor =1, add_se = True, Activation = 'HSwish'):
+    def __init__(self, ver = 'ver2', num_classes=100, wide_factor = 1, depth_factor =1, add_se = True, Activation = 'HSwish'):
         super(MicroNet, self).__init__()
         # NOTE: change conv1 stride 2 -> 1 for CIFAR10
         '''
         wide_factor: channel을 늘리는 비율
         depth_factor: depth를 늘리는 비율
         '''
-        self.cfg = [[2, 16, 2, 1],
-                    [2, 32, 1, 2],
-                    [2, 32, 1, 1],
-                    [2, 48, 3, 1],
-                    [2, 72, 1, 2],
-                    [2, 72, 4, 1],
-                    [2, 88, 1, 2],
-                    [2, 88, 2, 1],
-                    [2, 128, 1, 1]]
+        if ver == 'ver2':
+            self.cfg = [[2.5, 20, 2, 1],
+                        [2.5, 36, 1, 2],
+                        [2.5, 36, 1, 1],
+                        [2.5, 56, 3, 1],
+                        [2.5, 80, 1, 2],
+                        [2.5, 80, 4, 1],
+                        [2.5, 88, 1, 2],
+                        [2.5, 96, 2, 1],
+                        [2.5, 114, 1, 1]]
+        else:
+            self.cfg = [[3, 16, 2, 1],
+                        [3, 32, 1, 2],
+                        [3, 32, 1, 1],
+                        [3, 48, 3, 1],
+                        [3, 72, 1, 2],
+                        [3, 72, 4, 1],
+                        [3, 80, 1, 2],
+                        [3, 88, 2, 1],
+                        [3, 106, 1, 1]]
 
         #reconstruct structure config
         self.change_cfg(wide_factor, depth_factor)

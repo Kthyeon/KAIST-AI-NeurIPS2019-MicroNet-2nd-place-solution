@@ -10,10 +10,9 @@ from torch.nn.functional import normalize
 from Regularization import *
 from Utils.utils import accuracy, AverageMeter, progress_bar, get_output_folder
 import time
-from warmup_scheduler import GradualWarmupScheduler
 from torch.nn.utils import clip_grad_norm_
 
-def train_16bit(model, dataloader, test_loader, lr_type = 'step', input_regularize = 'cutmix', label_regularize = None, ortho = False, ortho_lr = 0.01):
+def train_16bit(model, dataloader, test_loader, args):
     device = model.device
     momentum = model.momentum
     learning_rate = model.lr
@@ -22,19 +21,25 @@ def train_16bit(model, dataloader, test_loader, lr_type = 'step', input_regulari
     gamma = model.gamma
     weight_decay = model.weight_decay
     nesterov = model.nesterov
-    if label_regularize == 'labelsmooth':
-        criterion = LabelSmoothing
-        (model.device, model.num_classes, 0.1, 1)
+    if args.label_regularize == 'labelsmooth':
+        criterion = LabelSmoothing(model.device, model.num_classes, 0.1, 1)
     else:
         criterion = model.criterion    
     batch_number = len(dataloader.dataset) // dataloader.batch_size
     
 
-    optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum=momentum, nesterov=nesterov,
+    if args.batch_wd:
+        optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum=momentum, nesterov=nesterov,
                                 weight_decay=weight_decay)
-    if lr_type == 'step':
+    else:
+        batch_params = [module for module in model.parameters() if module.ndimension() == 1]
+        other_params = [module for module in model.parameters() if module.ndimension() > 1]
+        optimizer = torch.optim.SGD([{'params' : batch_params, 'weight_decay': 0},
+            {'params': other_params, 'weight_decay': weight_decay}], lr=learning_rate, momentum=momentum, nesterov=nesterov)
+        
+    if args.lr_type == 'step':
         scheduler = lr_scheduler.MultiStepLR(gamma=gamma, milestones=milestones, optimizer=optimizer)
-    elif lr_type == 'cos':
+    elif args.lr_type == 'cos':
         scheduler = lr_scheduler.CosineAnnealingLR(optimizer=optimizer, T_max = num_epochs, eta_min=0.0005, last_epoch=-1)
     losses = []
     test_losses = []
@@ -46,18 +51,19 @@ def train_16bit(model, dataloader, test_loader, lr_type = 'step', input_regulari
 
     for epoch in range(num_epochs):
         model.train()
-        correct = 0
-        total = 0
         scheduler.step()
+        if args.label_regularize == 'labelsimilar':
+            similarity = fc_similarity(model, device)
+            criterion = LabelSimilarLoss(model.device, model.num_classes, similarity, 0.3, 1)
         
         for i, (images, labels) in enumerate(tqdm(dataloader)):
             images = images.type(torch.HalfTensor).to(device)
             labels = labels.type(torch.LongTensor).to(device)
             
-            if input_regularize:
-                if input_regularize == 'cutmix':
+            if args.input_regularize:
+                if args.input_regularize == 'cutmix':
                     lam, images, labels_a, labels_b = cutmix_16bit(images, labels, device)
-                elif input_regularize == 'mixup':
+                elif args.input_regularize == 'mixup':
                     lam, images, labels_a, labels_b = mixup_16bit(images, labels, device)
                 optimizer.zero_grad()
 
@@ -69,8 +75,8 @@ def train_16bit(model, dataloader, test_loader, lr_type = 'step', input_regulari
                 outputs = model(images)
                 loss = criterion(outputs, labels)
                 
-            if ortho:
-                loss += ortho_lr * l2_reg_ortho(model, device) + ortho_lr * conv3_l2_reg_ortho(model, device)
+            if args.ortho:
+                loss += args.ortho_lr * l2_reg_ortho(model, device)
                 
 
             losses.append(loss.item())
@@ -98,7 +104,8 @@ def train_16bit(model, dataloader, test_loader, lr_type = 'step', input_regulari
 
     return losses, accuracies, test_losses, test_accuracies, best_model_wts
 
-def train_prune_16bit(model, dataloader, test_loader, best_model_wts_init, lr_type = 'step',  input_regularize = 'cutmix', label_regularize = None, ortho = False, ortho_lr = 0.01, prune_rate = 50.):
+
+def train_prune_16bit(model, dataloader, test_loader, best_model_wts_init, args, prune_rate = 50.):
     device = model.device
     momentum = model.momentum
     learning_rate = model.lr
@@ -108,18 +115,25 @@ def train_prune_16bit(model, dataloader, test_loader, best_model_wts_init, lr_ty
     weight_decay = model.weight_decay
     nesterov = model.nesterov
     
-    if label_regularize == 'labelsmooth':
+    if args.label_regularize == 'labelsmooth':
         criterion = LabelSmoothingLoss(model.device, model.num_classes, 0.1, 1)
     else:
         criterion = model.criterion
     batch_number = len(dataloader.dataset) // dataloader.batch_size
     
 
-    optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum=momentum, nesterov=nesterov,
+    if args.batch_wd:
+        optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum=momentum, nesterov=nesterov,
                                 weight_decay=weight_decay)
-    if lr_type == 'step':
+    else:
+        batch_params = [module for module in model.parameters() if module.ndimension() == 1]
+        other_params = [module for module in model.parameters() if module.ndimension() > 1]
+        optimizer = torch.optim.SGD([{'params' : batch_params, 'weight_decay': 0},
+            {'params': other_params, 'weight_decay': weight_decay}], lr=learning_rate, momentum=momentum, nesterov=nesterov)
+        
+    if args.lr_type == 'step':
         scheduler = lr_scheduler.MultiStepLR(gamma=gamma, milestones=milestones, optimizer=optimizer)
-    elif lr_type == 'cos':
+    elif args.lr_type == 'cos':
         scheduler = lr_scheduler.CosineAnnealingLR(optimizer=optimizer, T_max = num_epochs, eta_min=0.0005, last_epoch=-1)
     losses = []
     test_losses = []
@@ -136,7 +150,7 @@ def train_prune_16bit(model, dataloader, test_loader, best_model_wts_init, lr_ty
             model.load_state_dict(best_model_wts_init, strict = False)
             model.set_masks(masks)
         model.train()
-        if label_regularize == 'labelsimilar':
+        if args.label_regularize == 'labelsimilar':
             similarity = fc_similarity(model, device)
             criterion = LabelSimilarLoss(model.device, model.num_classes, similarity, 0.1, 1)
         correct = 0
@@ -147,10 +161,10 @@ def train_prune_16bit(model, dataloader, test_loader, best_model_wts_init, lr_ty
             images = images.type(torch.HalfTensor).to(device)
             labels = labels.type(torch.LongTensor).to(device)
             
-            if input_regularize:
-                if input_regularize == 'cutmix':
+            if args.input_regularize:
+                if args.input_regularize == 'cutmix':
                     lam, images, labels_a, labels_b = cutmix_16bit(images, labels, device)
-                elif input_regularize == 'mixup':
+                elif args.input_regularize == 'mixup':
                     lam, images, labels_a, labels_b = mixup_16bit(images, labels, device)
                 optimizer.zero_grad()
 
@@ -162,8 +176,8 @@ def train_prune_16bit(model, dataloader, test_loader, best_model_wts_init, lr_ty
                 outputs = model(images)
                 loss = criterion(outputs, labels)
                 
-            if ortho:
-                loss += ortho_lr * l2_reg_ortho(model, device) + ortho_lr * conv3_l2_reg_ortho(model, device)
+            if args.ortho:
+                loss += args.ortho_lr * l2_reg_ortho(model, device)
 
             losses.append(loss.item())
 
@@ -219,7 +233,7 @@ def eval_16bit(model, test_loader):
 
     print('Loss: {:.3f} | Acc1: {:.3f}% | Acc5: {:.3f}%'.format(losses.avg, top1.avg, top5.avg))
 
-    acc = 100 * top1.avg
+    acc = top1.avg
     loss = losses.avg
 
     return acc, loss

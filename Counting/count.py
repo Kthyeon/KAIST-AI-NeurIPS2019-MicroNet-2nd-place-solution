@@ -17,23 +17,13 @@ register_hooks = {
     nn.ConvTranspose2d: count_convNd,
     nn.ConvTranspose3d: count_convNd,
 
-    nn.BatchNorm1d: count_bn,
-    nn.BatchNorm2d: count_bn,
-    nn.BatchNorm3d: count_bn,
+    nn.BatchNorm1d: zero_ops,
+    nn.BatchNorm2d: zero_ops,
+    nn.BatchNorm3d: zero_ops,
 
-    nn.ReLU: count_relu,
     nn.ReLU6: hswish_ops,
-    nn.LeakyReLU: count_relu,
     nn.Sigmoid: sigmoid_ops,
     
-
-    nn.MaxPool1d: zero_ops,
-    nn.MaxPool2d: zero_ops,
-    nn.MaxPool3d: zero_ops,
-    nn.AdaptiveMaxPool1d: zero_ops,
-    nn.AdaptiveMaxPool2d: zero_ops,
-    nn.AdaptiveMaxPool3d: zero_ops,
-
     nn.AvgPool1d: count_avgpool,
     nn.AvgPool2d: count_avgpool,
     nn.AvgPool3d: count_avgpool,
@@ -43,14 +33,10 @@ register_hooks = {
 
     nn.Linear: count_linear,
     nn.Dropout: zero_ops,
-
-    nn.Upsample: count_upsample,
-    nn.UpsamplingBilinear2d: count_upsample,
-    nn.UpsamplingNearest2d: count_upsample
 }
 
 
-def profile(model, inputs, custom_ops=None, verbose=True):
+def count(model, inputs, custom_ops=None, verbose=True):
     handler_collection = []
     if custom_ops is None:
         custom_ops = {}
@@ -59,26 +45,28 @@ def profile(model, inputs, custom_ops=None, verbose=True):
         if len(list(m.children())) > 0:
             return
 
-        if hasattr(m, "total_ops") or hasattr(m, "total_params"):
-            logger.warning("Either .total_ops or .total_params is already defined in %s."
+        if hasattr(m, "total_add_ops") or hasattr(m, "total_params") or hasattr(m, "total_mul_ops"):
+            logger.warning("Either .total_add_ops or .total_mul_ops or .total_params is already defined in %s."
                            "Be careful, it might change your code's behavior." % str(m))
 
-        m.register_buffer('total_ops', torch.zeros(1))
+        m.register_buffer('total_add_ops', torch.zeros(1))
+        m.register_buffer('total_mul_ops', torch.zeros(1))
         m.register_buffer('total_params', torch.zeros(1))
 
         for p in m.parameters():
-            m.total_params += torch.Tensor([p.numel()])
+            if p.ndimension() != 1:
+                m.total_params += torch.Tensor([p.numel()])
 
         m_type = type(m)
         fn = None
-        if m_type in custom_ops:  # if defined both op maps, use custom_ops to overwrite.
+        if m_type in custom_ops: 
             fn = custom_ops[m_type]
         elif m_type in register_hooks:
             fn = register_hooks[m_type]
 
         if fn is None:
             if verbose:
-                print("THOP has not implemented counting method for ", m)
+                print("Count has not implemented counting method for ", m)
         else:
             if verbose:
                 print("Register FLOP counter for module %s" % str(m))
@@ -93,15 +81,18 @@ def profile(model, inputs, custom_ops=None, verbose=True):
     with torch.no_grad():
         model(*inputs)
 
-    total_ops = 0
+    total_add_ops = 0
+    total_mul_ops = 0    
     total_params = 0
     for m in model.modules():
         if len(list(m.children())) > 0:  # skip for non-leaf module
             continue
-        total_ops += m.total_ops
+        total_add_ops += m.total_add_ops
+        total_mul_ops += m.total_mul_ops
         total_params += m.total_params
 
-    total_ops = total_ops.item()
+    total_add_ops = total_add_ops.item()
+    total_mul_ops = total_mul_ops.item()
     total_params = total_params.item()
 
     # reset model to original status
@@ -113,9 +104,11 @@ def profile(model, inputs, custom_ops=None, verbose=True):
     for n, m in model.named_modules():
         if len(list(m.children())) > 0:
             continue
-        if "total_ops" in m._buffers:
-            m._buffers.pop("total_ops")
+        if "total_add_ops" in m._buffers:
+            m._buffers.pop("total_add_ops")
+        if "total_mul_ops" in m._buffers:
+            m._buffers.pop("total_mul_ops")
         if "total_params" in m._buffers:
             m._buffers.pop("total_params")
 
-    return total_ops, total_params
+    return total_add_ops, total_mul_ops, total_params

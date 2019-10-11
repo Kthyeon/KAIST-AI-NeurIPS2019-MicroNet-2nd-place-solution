@@ -12,7 +12,7 @@ def to_var(x, device, requires_grad=False, volatile=False):
     """
     #@if torch.cuda.is_available():
     #    x = x.to(device)
-    return Variable(x, requires_grad=requires_grad, volatile=volatile).type(torch.HalfTensor).to(device)
+    return Variable(x, requires_grad=requires_grad, volatile=volatile).to(device)
 
     
 def prune_rate(model, verbose=True):

@@ -66,6 +66,67 @@ def l2_reg_ortho(mdl, device):
                     
                 
     return l2_reg
+'''
+def l2_reg_ortho_32bit(mdl, device):
+    """
+    SRIP function from 'Can We Gain More from Orthogonality Regularizations in Training Deep CNNs?,' 
+    https://arxiv.org/abs/1810.09102.
+    """
+    l2_reg = None
+    for name, module in mdl.named_children():
+        if 'layer' in name:
+            for m in module:
+                W = m.conv1.weight
+                cols = W[0].numel()
+                w1 = W.view(-1,cols)
+                wt = torch.transpose(w1,0,1)
+                m  = torch.matmul(wt,w1)
+                ident = Variable(torch.eye(cols,cols)).to(device)
+
+                w_tmp = (m - ident)
+                height = w_tmp.size(0)
+                u = normalize(w_tmp.new_empty(height).normal_(0,1), dim=0, eps=1e-12)
+                v = normalize(torch.matmul(w_tmp.t(), u), dim=0, eps=1e-12)
+                u = normalize(torch.matmul(w_tmp, v), dim=0, eps=1e-12)
+                sigma = torch.dot(u, torch.matmul(w_tmp, v))
+
+                if l2_reg is None:
+                    l2_reg = (sigma)**2
+                else:
+                    l2_reg = l2_reg + (sigma)**2
+                    
+                
+    return l2_reg
+'''
+def l2_reg_ortho_32bit(mdl, device):
+    l2_reg = None
+    for W in mdl.parameters():
+        if W.ndimension() < 2:
+            continue
+        elif W.ndimension() == 4:
+            if W.shape[3] == 1:
+                cols = W[0].numel()
+                rows = W.shape[0]
+                w1 = W.view(-1,cols)
+                wt = torch.transpose(w1,0,1)
+                m  = torch.matmul(wt,w1)
+                ident = Variable(torch.eye(cols,cols)).to(device)            
+
+                w_tmp = (m - ident)
+                height = w_tmp.size(0)
+                u = normalize(w_tmp.new_empty(height).normal_(0, 1), dim=0, eps=1e-12)
+                v = normalize(torch.matmul(w_tmp.t(), u), dim=0, eps=1e-12)
+                u = normalize(torch.matmul(w_tmp, v), dim=0, eps=1e-12)
+                sigma = torch.dot(u, torch.matmul(w_tmp, v))
+
+                if l2_reg is None:
+                    l2_reg = (torch.norm(sigma,2))**2
+                    num = 1
+                else:
+                    l2_reg = l2_reg + (torch.norm(sigma,2))**2
+                    num += 1
+                    
+    return l2_reg / num
 
 def conv3_l2_reg_ortho(mdl, device):
     """
@@ -82,6 +143,37 @@ def conv3_l2_reg_ortho(mdl, device):
                 wt = torch.transpose(w1,0,1)
                 m  = torch.matmul(wt,w1)
                 ident = Variable(torch.eye(cols,cols)).type(torch.HalfTensor).to(device)
+
+                w_tmp = (m - ident)
+                height = w_tmp.size(0)
+                u = normalize(w_tmp.new_empty(height).normal_(0,1), dim=0, eps=1e-12)
+                v = normalize(torch.matmul(w_tmp.t(), u), dim=0, eps=1e-12)
+                u = normalize(torch.matmul(w_tmp, v), dim=0, eps=1e-12)
+                sigma = torch.dot(u, torch.matmul(w_tmp, v))
+
+                if l2_reg is None:
+                    l2_reg = (sigma)**2
+                else:
+                    l2_reg = l2_reg + (sigma)**2
+                    
+                
+    return l2_reg
+
+def conv3_l2_reg_ortho_32bit(mdl, device):
+    """
+    SRIP function from 'Can We Gain More from Orthogonality Regularizations in Training Deep CNNs?,' 
+    https://arxiv.org/abs/1810.09102.
+    """
+    l2_reg = None
+    for name, module in mdl.named_children():
+        if 'layer' in name:
+            for m in module:
+                W = m.conv3.weight
+                cols = W[0].numel()
+                w1 = W.view(-1,cols)
+                wt = torch.transpose(w1,0,1)
+                m  = torch.matmul(wt,w1)
+                ident = Variable(torch.eye(cols,cols)).to(device)
 
                 w_tmp = (m - ident)
                 height = w_tmp.size(0)

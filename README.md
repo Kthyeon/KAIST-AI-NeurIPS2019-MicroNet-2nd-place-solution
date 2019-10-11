@@ -87,7 +87,7 @@ Gradient descent is very important to train deep neural network. But, convention
 
 #### I. [Lottery Ticket Hypothesis](https://arxiv.org/abs/1803.03635) [Frankle et al., 2018]
 
-[Han et al., 2015] suggested deep learning pruning method based on magnitude very well. But, this conventional pruning method has very critical weakness which is the too many re-training process. To address it, [Frankle et al., 2019] defines the lottery ticket hypothesis which is that A randomly-initialized, dense-neural networks contain subnetworks called winning tickets. Here, winning ticket can reach the comparable test acuuracy in at most same iteration of original netwrok through re-initialization right before re-training process. As lottery ticket is a very recent powerful pruning method, to get pruned network, we prune the network almost same with this method except for random initialization.
+[Han et al., 2015] suggested deep learning pruning method based on magnitude very well. But, this conventional pruning method has very critical weakness which is the too many re-training process. To address it, [Frankle et al., 2019] defines the lottery ticket hypothesis which is that A randomly-initialized, dense-neural networks contain subnetworks called winning tickets. Here, winning ticket can reach the comparable test acuuracy in at most same iteration of original network through re-initialization right before re-training process. As lottery ticket is a very recent powerful pruning method, to get pruned network, we prune the network almost same with this method.
 
 # Reproduce
 
@@ -156,7 +156,7 @@ After this, you may get the final checkpoints which have the accuracy higher tha
 
 We refer to ‘thop’ library source from [here](https://github.com/Lyken17/pytorch-OpCounter) to count the add operations and multiplication operations. However, to keep the rules of (Neurips 19’s)  micronet challenge, we change many parts of the counting functions. In code, addition is counted 3 and multiplication is counted 1 for the relu6 operations. This is because ReLU6 is only used in hard swish function so that this counting policy is actually for hard swish function when counting the operations of our network.
 
-Details about score method, we deal with it in the jupyter notebooke file `Score_MicroNet.ipynb`.
+Details about score method, we deal with it in jupyter notebook file `Score_MicroNet.ipynb`.
 
 
 Thank you for reading.

@@ -119,10 +119,11 @@ Minimum lr: 0.0005
 Weight decay: 1e-5
 Momentum: 0.9 (on batchnorm, we use 0.99)
 Nesterov: True
-Epoch: 800
-Period T: 200
-Orthonormal coefficient: 0.01
+Epoch: 600
+Period T: 150
+Orthonormal coefficient: 0.7
 Data: CIFAR100 with fast autoaugmentation
+Batch weight decay: True
 Batch size: 128
 Cutmix alpha: 1
 loss function: weighted labelsmooth function (ours)
@@ -132,19 +133,30 @@ loss function: weighted labelsmooth function (ours)
 To get our pruned micronet, you go through 2 steps: I. Smooth Signal propagation, II. Iterative lottery ticket prune.
 
 #### I. Smooth Signal propagation
-To reproduce our network, run:
+To reproduce our network as version 2, run:
 
 ```
-python3 micronet_main.py --model=micronet --dataset=CIFAR100 --lr=0.1 --batch_size=128 --lr_type=cos --n_epoch=800 --input_regularize=cutmix --label_regularization=labelsimilar --name=micronet_ver_test --ortho_lr=0.01
+python3 micronet_main.py --model=micronet --dataset=CIFAR100 --lr=0.1 --batch_size=128 --lr_type=cos --n_epoch=600 --input_regularize=cutmix --label_regularization=crossentropy --name=micronet_reproduce --ortho_lr=0.7 --model_ver=ver2 --progress_name=reproduce_progress
 ```
 
 #### II. Iterative lottery ticket prune
-First of all, you should load the parameters from the step I network (name: micronet_ver_test), and then execute the code with your desired prune rate. We get the network with 50% prune rate.
+First of all, you should load the parameters from the step I network (name: micronet_ver_test), and then execute the code with your desired prune rate. We get the network with 45% prune rate.
 
 ```
-python3 micronet_main.py --model=micronet_prune --dataset=CIFAR100 --lr=0.1 --batch_size=128 --lr_type=cos --n_epoch=800 --input_regularize=cutmix --label_regularization=labelsimilar --name=micronet_ver_test --ortho_lr=0.01 --prune_rate=50.
+python3 micronet_main.py --model=micronet_prune --dataset=CIFAR100 --lr=0.1 --batch_size=128 --lr_type=cos --n_epoch=600 --input_regularize=cutmix --label_regularization=crossentropy --name=micronet_reproduce_pr1 --ortho_lr=0.7 --max_prune_rate=45. --load_name=micronet_reproduce --model_ver=ver2
 ```
+And after training above, run prune-training once again:
+```
+python3 micronet_main.py --model=micronet_prune --dataset=CIFAR100 --lr=0.1 --batch_size=128 --lr_type=cos --n_epoch=600 --input_regularize=cutmix --label_regularization=crossentropy --name=micronet_reproduce_pr2 --ortho_lr=0.7 --min_prune_rate=45. --max_prune_rate=65. --load_name=micronet_reproduce_pr1 --model_ver=ver2
+```
+
+After this, you may get the final checkpoints which have the accuracy higher than 80% with 65% pruning.
 
 ## 5. FLOPs
 
 We refer to ‘thop’ library source from [here](https://github.com/Lyken17/pytorch-OpCounter) to count the add operations and multiplication operations. However, to keep the rules of (Neurips 19’s)  micronet challenge, we change many parts of the counting functions. In code, addition is counted 3 and multiplication is counted 1 for the relu6 operations. This is because ReLU6 is only used in hard swish function so that this counting policy is actually for hard swish function when counting the operations of our network.
+
+Details about score method, we deal with it in the jupyter notebooke file `Score_MicroNet.ipynb`.
+
+
+Thank you for reading.

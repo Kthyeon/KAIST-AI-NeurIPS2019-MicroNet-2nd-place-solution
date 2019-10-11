@@ -16,7 +16,7 @@ Many networks are initialized with Kaiming initialization or Xavier initializati
 
 ## 3. **Weighted label smooth loss function**
 
-The most well-known loss function in convolutional neural networks is Cross-Entropy loss. In the recent, label smooth function can not only enhance the robustness, but also increase the performance so that many replace the loss function as label smooth.  However, this method doesn’t deal with the class-correlation, so sometimes the network is not well-trained when increasing the epsilon. In our loss function called weighted label smooth loss function, this distributes the epsilon with considering class-correlation. The key idea of scaling the class-relativity is to score the weight as the cosine similarity with the class representative feature vector from fully connected layers’s i-th row vector.
+The most well-known loss function in convolutional neural networks is Cross-Entropy loss. In the recent, label smooth function can not only enhance the robustness, but also increase the performance so that many replace the loss function as label smooth.  However, this method doesn’t deal with the class-correlation, so sometimes the network is not well-trained when increasing the epsilon. In our loss function called weighted label smooth loss function, this distributes the epsilon with considering class-correlation. The key idea of scaling the class-relativity is to score the weight as the cosine similarity with the class representative feature vector from fully-connected layers’s i-th row vector.
 
 ![smooth](./images/Adaptive_Label_Smooth.png)
 

@@ -4,7 +4,7 @@ The main contributions are divided into four parts.
 
 ## 1. **Orthonormal regularization**
 
-From previous works, dynamic isometric property increases the network performance, but actually the gain from previous orthonormal regularizer is minuscule. We found that attaching the orthonormal regularizer only on 1x1 convolution increase remarkable amounts in the performance, and we argue that this is very related to feature map space.
+From previous works, dynamic isometric property increases the network performance, but actually the gain from previous orthonormal regularizer is minuscule. We found that attaching the orthonormal regularizer only on 1x1 convolution increases remarkable amounts in the performance, and we argue that this is very related to feature map space.
 
 ![orthonormality](./images/Orthonormality.png)
 

@@ -20,11 +20,11 @@ def zero_ops(m, x, y):
 def count_convNd(m, x, y):
     x = x[0]
 
-    kernel_ops = m.weight.size()[2:].numel()  # Kw x Kh
+    kernel_ops = m.weight.size()[2:].numel() * m.in_channels // m.groups
     bias_ops = 1 #if m.bias is not None else 0
     
-    total_add_ops =  y.nelement() * (m.in_channels // m.groups * (kernel_ops - 1)) * non_sparsity(m.weight) + y.nelement() * bias_ops
-    total_mul_ops = y.nelement() * (m.in_channels // m.groups * kernel_ops) * non_sparsity(m.weight)
+    total_add_ops =  y.nelement() * (kernel_ops - 1) * non_sparsity(m.weight) + y.nelement() * bias_ops
+    total_mul_ops = y.nelement()  * kernel_ops * non_sparsity(m.weight)
     total_params = m.weight.numel() * non_sparsity(m.weight) + m.weight.shape[0]
 
     m.total_add_ops += torch.Tensor([total_add_ops])

@@ -23,7 +23,7 @@ def count_convNd(m, x, y):
     kernel_ops = m.weight.size()[2:].numel() * m.in_channels // m.groups
     bias_ops = 1 #if m.bias is not None else 0
     
-    total_add_ops =  y.nelement() * (kernel_ops - 1) * non_sparsity(m.weight) + y.nelement() * bias_ops
+    total_add_ops =  y.nelement() * (kernel_ops * non_sparsity(m.weight) - 1)  + y.nelement() * bias_ops
     total_mul_ops = y.nelement()  * kernel_ops * non_sparsity(m.weight)
     total_params = m.weight.numel() * non_sparsity(m.weight) + m.weight.shape[0]
 

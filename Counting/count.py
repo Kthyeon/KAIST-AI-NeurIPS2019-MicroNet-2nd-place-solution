@@ -53,9 +53,9 @@ def count(model, inputs, custom_ops=None, verbose=True):
         m.register_buffer('total_mul_ops', torch.zeros(1))
         m.register_buffer('total_params', torch.zeros(1))
 
-        for p in m.parameters():
-            if p.ndimension() != 1:
-                m.total_params += torch.Tensor([p.numel()])
+        #for p in m.parameters():
+        #    if p.ndimension() != 1:
+        #        m.total_params += torch.Tensor([p.numel()])
 
         m_type = type(m)
         fn = None

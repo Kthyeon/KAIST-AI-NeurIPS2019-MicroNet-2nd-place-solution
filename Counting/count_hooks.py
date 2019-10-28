@@ -15,19 +15,21 @@ def non_sparsity(weight):
 def zero_ops(m, x, y):
     m.total_add_ops += torch.Tensor([0])
     m.total_mul_ops += torch.Tensor([0])
-    
-    
+    m.total_params  += torch.Tensor([0])
+
 def count_convNd(m, x, y):
     x = x[0]
 
     kernel_ops = m.weight.size()[2:].numel()  # Kw x Kh
-    bias_ops = 1 if m.bias is not None else 0
+    bias_ops = 1 #if m.bias is not None else 0
     
-    total_add_ops =  y.nelement() * (m.in_channels // m.groups * kernel_ops - 1 + bias_ops) * non_sparsity(m.weight)
+    total_add_ops =  y.nelement() * (m.in_channels // m.groups * (kernel_ops - 1)) * non_sparsity(m.weight) + y.nelement() * bias_ops
     total_mul_ops = y.nelement() * (m.in_channels // m.groups * kernel_ops) * non_sparsity(m.weight)
+    total_params = m.weight.numel() * non_sparsity(m.weight) + m.weight.shape[0]
 
     m.total_add_ops += torch.Tensor([total_add_ops])
     m.total_mul_ops += torch.Tensor([total_mul_ops])
+    m.total_params += torch.Tensor([total_params])
 
 
 
@@ -39,7 +41,7 @@ def count_bn(m, x, y):
 
     m.total_add_ops += torch.Tensor([nelements]) * 2
     m.total_mul_ops += torch.Tensor([nelements]) * 2
-
+    
 def hswish_ops(m, x, y):
     x = x[0]
 
@@ -47,7 +49,8 @@ def hswish_ops(m, x, y):
 
     m.total_add_ops += torch.Tensor([nelements])
     m.total_mul_ops += torch.Tensor([nelements]) * 4
-    
+    m.total_params += torch.Tensor([0])
+
 def sigmoid_ops(m, x, y):
     x = x[0]
 
@@ -55,7 +58,8 @@ def sigmoid_ops(m, x, y):
 
     m.total_add_ops += torch.Tensor([nelements])
     m.total_mul_ops += torch.Tensor([nelements]) * 2
-    
+    m.total_params += torch.Tensor([0])
+
 
 
 def count_avgpool(m, x, y):
@@ -67,6 +71,7 @@ def count_avgpool(m, x, y):
     
     m.total_add_ops += torch.Tensor([total_add_ops])
     m.total_mul_ops += torch.Tensor([total_mul_ops])
+    m.total_params += torch.Tensor([0])
 
 def count_adap_avgpool(m, x, y):
     kernel = torch.Tensor([*(x[0].shape[2:])]) // torch.Tensor(list((m.output_size,))).squeeze()
@@ -78,7 +83,7 @@ def count_adap_avgpool(m, x, y):
     
     m.total_add_ops += torch.Tensor([total_add_ops])
     m.total_mul_ops += torch.Tensor([total_mul_ops])
-
+    m.total_params += torch.Tensor([0])
 
 def count_linear(m, x, y):
     # per output element
@@ -87,6 +92,8 @@ def count_linear(m, x, y):
     num_elements = y.numel()
     total_add_ops = total_add * num_elements * non_sparsity(m.weight)
     total_mul_ops = total_mul * num_elements * non_sparsity(m.weight)
-
+    total_params = m.weight.numel() * non_sparsity(m.weight) + m.bias.numel() * non_sparsity(m.bias)
+    
     m.total_add_ops += torch.Tensor([total_add_ops]) 
     m.total_mul_ops += torch.Tensor([total_mul_ops]) 
+    m.total_params += torch.Tensor([total_params])

@@ -192,6 +192,11 @@ Current code base is tested under following environment:
 4. Numpy 1.16.2
 5. tqdm
 
+# Member
+* Taehyeon Kim
+* Jonghyup Kim
+* Changhwan Kim
+
 ## Contact
 
 To contact us:

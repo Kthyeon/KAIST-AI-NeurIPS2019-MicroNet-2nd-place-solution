@@ -202,3 +202,7 @@ Current code base is tested under following environment:
 To contact us:
 
 Tae hyeon Kim, potter32@kaist.ac.kr
+
+## Acknowledgement
+
+This work was supported by Institute for Information & Communications Technology Promotion (IITP) grant funded by the Korea government (MSIT) [No.2018-0-00278,Development of Big Data Edge Analytics SW Technology for Load Balancing and Active Timely Response].

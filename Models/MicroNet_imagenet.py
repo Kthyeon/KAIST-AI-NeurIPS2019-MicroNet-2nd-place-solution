@@ -104,8 +104,8 @@ class MicroNet_imagenet(nn.Module):
         super(MicroNet_imagenet, self).__init__()
         # NOTE: change conv1 stride 2 -> 1 for CIFAR10
         '''
-        wide_factor: channel을 늘리는 비율
-        depth_factor: depth를 늘리는 비율
+        wide_factor: ratio to expand channel
+        depth_factor: ratio to expand depth
         '''
         self.cfg = [[1, 16, 2, 1],
                     [3, 24, 1, 2],

@@ -108,8 +108,8 @@ class MicroNet(nn.Module):
         super(MicroNet, self).__init__()
         # NOTE: change conv1 stride 2 -> 1 for CIFAR10
         '''
-        wide_factor: expansion ratio of channel
-        depth_factor: expansion ratio of depth
+        wide_factor: ratio to expand channel
+        depth_factor: ratio to expand depth
         '''
         if ver == 'ver2':
             self.cfg = [[2.5, 20, 2, 1],

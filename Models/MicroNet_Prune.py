@@ -103,9 +103,9 @@ class MicroNet_Prune(nn.Module):
         super(MicroNet_Prune, self).__init__()
         # NOTE: change conv1 stride 2 -> 1 for CIFAR10
         '''
-        groups : High path에서의 squeeze하는 비율
-        wide_factor: channel을 늘리는 비율
-        depth_factor: depth를 늘리는 비율
+        groups : ratio to squeeze in High-path
+        wide_factor: ratio to expand channel
+        depth_factor: ratio to expand depth
         '''
         if ver == 'ver2':
             self.cfg = [[2.5, 20, 2, 1],

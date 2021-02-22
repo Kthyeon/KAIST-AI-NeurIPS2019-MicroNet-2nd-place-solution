@@ -1,6 +1,6 @@
 # Our Contribution
-
-The main contributions are divided into four parts.
+We proceed this work through [PMLR Volume123](http://proceedings.mlr.press/v123/kim20a.html).
+Our main contributions are divided into four parts.
 
 ## 1. **Orthonormal regularization**
 

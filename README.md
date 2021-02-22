@@ -1,5 +1,5 @@
 # Our Contribution
-We proceed this work through [PMLR Volume123](http://proceedings.mlr.press/v123/kim20a.html). The paper title is `Efficient Model for Image Classification With Regularization Tricks`. Our main contributions are divided into four parts.
+We proceed this work through [PMLR Volume123](http://proceedings.mlr.press/v123/kim20a.html)(Proceedings of the NeurIPS 2019 Competition and Demonstration Track, PMLR 123:13-26, 2020). The paper title is `Efficient Model for Image Classification With Regularization Tricks`. Our main contributions are divided into four parts.
 
 ## 1. **Orthonormal regularization**
 
